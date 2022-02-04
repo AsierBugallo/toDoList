@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+    <style>
+        *{
+            font-family: Arial, Helvetica, sans-serif;
+            margin: 0px;
+        }
+        .container{
+            width: 649px;
+        }
+        
+        .head{
+            background-color: #f24335;
+            padding-top: 35px;
+            padding-bottom: 50px;
+            padding-left: 20px;
+            width: 650px;
+        }
+        .title{
+            margin: 0;
+            font-size: 37px;
+            padding-bottom: 5px;
+            color: white;
+            text-align: center;
+        }
+        .task{
+            width: 500px;
+            height: 37px;
+            padding-left: 10px;
+            border: 0px;
+            color: #555555;
+        }
+        .button{
+            width: 115px;
+            height: 39px;
+            border: 0;
+            color: #555555;
+            background-color: #d9d9d8;
+            font-weight: bold;
+        }
+        .taskList{
+            color: black;
+            padding-left: 0px;
+        }
+        #invalidField{
+          padding-top: 10px;
+          padding-left: 3px;
+          color: white;
+        }
+        .toDo {
+            border: none;
+            width: 120px;
+            padding: 3px;
+            margin-right: 10px;
+            margin-left: 15px;
+        }
+        
+        .listStyle {
+            margin-top: 0px;
+            padding-top: 9px;
+            width: 100%;
+            height: 30px;
+            background-color: #f8f8f8;
+            list-style-type: none;
+            padding-left: 21px;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .highlighted{
+            background-color: #eeeded;
+        }
+
+        .closeBut{
+            height: 22px;
+            background-color: transparent;
+            border: none;
+            margin-right: 10px;
+            width: fit-content;
+        }
+
+        .closeBut:hover{
+            background-color: rgb(187, 186, 186);
+        }
+
+        #taskCount{
+            width: 670px;
+            text-align: right;
+            padding: 0;
+            margin-top: 7px;
+        }
+
+    </style>
+    <script>
+        let contador = 0;
+        let highlighted = "highlighted";
+        let counterTasks = 0;
+
+    	let arrayTask = {
+        }
+      
+    	function stopExecution(e) {
+            e.preventDefault();
+            return;
+        }
+
+      function changeStatus(event){
+        const content = event.target;
+
+        const states = {
+          1: { value: 'ToDo', color: 'blue'},
+          2: { value: 'In Progress', color: 'yellow'},
+          3: { value: 'Done', color: 'orange'},
+          4: { value: 'Ready to Verify', color: 'green'},
+          5: { value: 'Testing', color: 'red'},
+        }
+        
+        let nextState = parseInt(content.id) + 1;
+        
+        if(!states[nextState]) {
+        	nextState = 1;
+      	}
+        
+      	content.innerHTML = states[nextState].value;
+    		content.style.backgroundColor = states[nextState].color;
+    		content.id = nextState;
+      }
+      
+      function deleteTask(event){
+           event.target.parentElement.remove();
+           updateCounterTasks();
+      }
+
+      function updateCounterTasks(){
+          const taskList = document.querySelector('.taskList');
+          const taskCount = document.querySelector('#taskCount');
+
+          counterTasks = taskList.childElementCount;
+          let text = "Tienes un total de " + counterTasks + " tareas para hacer";
+
+          taskCount.innerHTML = text;
+      }
+
+      function addTask(event) {
+          let task = document.querySelector('.task').value;
+          let taskList = document.querySelector('.taskList');
+          let invalidField = document.querySelector('#invalidField');
+          
+          if(task == "") {
+              invalidField.style.display = 'block';
+      		  invalidField.innerHTML = 'Introduzca un valor valido por favor';
+              return stopExecution(event);
+          } else {
+              const button = `<button class = "toDo" id="1" onclick="changeStatus(event)">To Do</button>`;
+           	  const closeButton = `<button class = "closeBut" id="delete-button" onclick="deleteTask(event)">X</button>`;
+            
+              let today = new Date();
+              let actualDate = today.getDate() + "/" + today.getMonth()+1 + "/" + today.getFullYear() + " " + today.getHours() + ":";
+              if (today.getMinutes() < 10){
+                actualDate += "0" + today.getMinutes();
+              } else {
+                actualDate += today.getMinutes();
+              }
+              actualDate += "h";
+
+              if (contador%2 == 0){
+                  highlighted = "highlighted";
+              } else {
+                  highlighted = "";
+              }
+
+              invalidField.style.display = "none";
+              const taskToAdd =  `<li class="listStyle ${highlighted}"><div>${actualDate}${button}<strong>${task}</strong></div>${closeButton}</li>`;
+              arrayTask[contador] = taskToAdd; 
+              taskList.innerHTML += arrayTask[contador];
+              text.value = "";
+              contador++;
+              updateCounterTasks();
+              return stopExecution(event);
+          }
+      }
+    
+    </script>
+
+    <body>
+        <div class="container">
+            <div class="head">
+                <h1 class="title">My To Do List</h1>
+                <form onsubmit = "addTask(event)">
+                    <input class="task" type="text" id="text" placeholder="Title...">
+                    <input class="button" type="submit" value="Add" >
+                    <div id="invalidField"></div>
+                </form>
+            </div>
+
+            <ul class="taskList"></ul>
+            <div id = "taskCount">Tienes un total de 0 tareas para hacer</div>
+        </div>
+    </body>
+</html>
